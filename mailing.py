@@ -7,6 +7,7 @@ import random, string
 import argparse
 from datetime import datetime
 import pymysql
+import configparser
 
 def getRandomString(length):
     return ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(length))
@@ -15,17 +16,30 @@ parser = argparse.ArgumentParser(description = 'Create a number of email address
 parser.add_argument("N", help = "number of accounts to create", type = int)
 args = parser.parse_args()
 
+config = configparser.ConfigParser()
+config.read('config.ini')
+print(config.sections())
+
 LOGIN_URL = 'https://calmail.berkeley.edu/my/lists/index'
 CALMAIL_AUTH_URL = 'https://auth.berkeley.edu/cas/login?renew=true&service=https%3A%2F%2Fcalmail.berkeley.edu%2Flogin%3Fnext%3D%252Fmy%252Flists%252Findex'
 CALMAIL_LIST_URL = 'https://calmail.berkeley.edu/my/lists/create_group'
 # Fill in your details here to be posted to the login form.
+payload = {
+    '_eventId': 'submit',
+    'geolocation': '',
+    'submit': 'Sign In'
+}
+payload['username'] = config['berkeley-login']['user']
+payload['password'] = config['berkeley-login']['password']
 
-connection = pymysql.connect(host='localhost',
-                             user='root',
-                             password='runescape',
-                             db='accounts_db',
+
+connection = pymysql.connect(host=config['sql']['host'],
+                             user=config['sql']['user'],
+                             password=config['sql']['password'],
+                             db=config['sql']['db'],
                              charset='utf8mb4',
                              cursorclass=pymysql.cursors.DictCursor)
+
 for i in range(args.N):
     email_name = getRandomString(16)
     s = requests.session()
@@ -48,6 +62,7 @@ for i in range(args.N):
     if result.status_code != 200:
         break
     timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
     sql = """INSERT INTO `accounts_db`.`accounts` (`email`, `email_creation_date`) VALUES ('""" + email_name + """@lists.berkeley.edu', '""" + timestamp + """')"""
     with connection.cursor() as cursor:
         cursor.execute(sql)
