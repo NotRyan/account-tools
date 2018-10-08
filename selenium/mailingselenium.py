@@ -37,9 +37,37 @@ if ("Login" in driver.title):
     finally:
         print('No authentication received within 20 seconds, exiting...')
 
+
+    elem = driver.find_element_by_id("id_localpart")
+    print("class: " + elem.get_attribute("class"))
+    print("displayed: " + str(elem.is_displayed()))
+    print("enabled: " + str(elem.is_enabled()))
+    print("selected: " + str(elem.is_selected()))
+
     elem = driver.find_element_by_xpath(".//button[@value='Create List Dialog']")
     elem.click()
-    elem = driver.find_element_by_name("localpart")
-    email_name = getRandomString(16)
-    print(email_name)
-    elem.send_keys(email_name)
+    driver.switch_to_active_element()
+    #print(elem)
+    #print(elem.get_attribute("class"))
+
+    #driver.switch_to_alert()
+    #driver.switch_to_frame(driver.find_element_by_id('add_list_dialog'))
+    #elem = driver.find_element_by_name("localpart")
+    #elem = driver.find_element_by_class_name("mdl-textfield__input requiredfield")
+    list_dialog = driver.find_element_by_id('add_list_dialog')
+    #elem = list_dialog.find_element_by_id("id_localpart")
+    elem_list = driver.find_elements_by_id("id_localpart")
+    print(elem_list)
+
+    elem = driver.find_element_by_id("id_localpart")
+    print("class: " + elem_list[0].get_attribute("class"))
+    print("displayed: " + str(elem.is_displayed()))
+    print("enabled: " + str(elem.is_enabled()))
+    print("selected: " + str(elem.is_selected()))
+    elem.send_keys("aaaaaaaaaaa")
+
+
+
+    #email_name = getRandomString(16)
+    #print(email_name)
+    #elem.send_keys(email_name)
