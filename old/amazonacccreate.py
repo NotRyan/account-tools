@@ -9,9 +9,9 @@ SIGN_UP_URL_2 = "https://www.amazon.com/ap/register?openid.pape.max_auth_age=0&o
 
 captcha_regex = 'https.*(?=" data-refresh)'
 
-name = 'test namee'
-email = 'nozvs5ym580ryi3q@lists.berkeley.edu'
-password = 'aaa123'
+name = ''
+email = ''
+password = ''
 
 browser = mechanicalsoup.StatefulBrowser()
 browser.set_user_agent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.84 Safari/537.36")
