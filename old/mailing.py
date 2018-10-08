@@ -23,6 +23,7 @@ print(config.sections())
 LOGIN_URL = 'https://calmail.berkeley.edu/my/lists/index'
 CALMAIL_AUTH_URL = 'https://auth.berkeley.edu/cas/login?renew=true&service=https%3A%2F%2Fcalmail.berkeley.edu%2Flogin%3Fnext%3D%252Fmy%252Flists%252Findex'
 CALMAIL_LIST_URL = 'https://calmail.berkeley.edu/my/lists/create_group'
+#why is the json so weird? No idea, but this is the only way I could get the site to accept it
 # Fill in your details here to be posted to the login form.
 payload = {
     '_eventId': 'submit',
@@ -43,7 +44,7 @@ connection = pymysql.connect(host=config['sql']['host'],
 for i in range(args.N):
     email_name = getRandomString(16)
     s = requests.session()
-    login = s.get(CALMAIL_AUTH_URL,verify = False)
+    login = s.get(CALMAIL_AUTH_URL, headers = {'DNT':'1','Referer': CALMAIL_AUTH_URL},verify = False)
     tree = html.fromstring(login.text)
     payload['execution'] = tree.find(".//input[@name='execution']").get('value')
 
@@ -51,7 +52,7 @@ for i in range(args.N):
 
     list_headers = {
         "Referer": LOGIN_URL,
-        'X-CSRFToken': s.cookies['csrftoken'],
+        #'X-CSRFToken': s.cookies['csrftoken'],
         'Origin': 'https://calmail.berkeley.edu'
         }
 
@@ -59,6 +60,7 @@ for i in range(args.N):
 
     group_json = json.dumps({"group_name":email_name,"group_domain":"lists.berkeley.edu","who_can_post":"ANYONE_CAN_POST"}).encode("utf-8")
     result = s.post(CALMAIL_LIST_URL, data = group_json, cookies = s.cookies, headers = list_headers, verify = False)
+
     if result.status_code != 200:
         break
     timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
